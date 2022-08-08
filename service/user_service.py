@@ -33,4 +33,6 @@ def update_user(user: UserViewModel):
 
 def get_user(user_login: str):
     doc_ref = db.collection(u'users').document(user_login)
-    return doc_ref.get().to_dict()
+    if doc_ref.get().exists():
+        return doc_ref.get().to_dict()
+    raise Exception("User does not exist")
