@@ -42,6 +42,14 @@ def create_roadmap(roadmap: RoadmapViewModel):
     return roadmap
 
 
+def remove_roadmap(roadmap_id: str, user_name: str):
+    doc_ref = db.collection(u'roadmaps').document(roadmap_id)
+    doc_owner = doc_ref.get().to_dict()['owner']
+    if user_name == doc_owner:
+        db.collection(u'roadmaps').document(roadmap_id).delete()
+
+
+
 def get_roadmaps(user_login):
     doc_ref = db.collection(u'roadmaps').where(u'owner', u'==', user_login).get()
     docs = []

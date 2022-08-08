@@ -9,7 +9,7 @@ import uvicorn
 from model.roadmap_view_model import RoadmapViewModel
 
 from model.user_view_model import UserViewModel
-from service.roadmap_service import create_roadmap, get_roadmap, get_roadmaps
+from service.roadmap_service import create_roadmap, get_roadmap, get_roadmaps, remove_roadmap
 from service.user_service import create_user, get_user, update_user
 app = FastAPI()
 app_public = FastAPI(openapi_prefix='/public')
@@ -134,6 +134,14 @@ async def put_update_user(user: UserViewModel, Authorization=Header(...)):
 async def post_create_roadmap(roadmap: RoadmapViewModel, Authorization=Header(...)):
     if authenticated_user(Authorization, roadmap.owner):
         return create_roadmap(roadmap)
+
+
+@app_private.delete("/roadmap/{roadmap_id}")
+async def delete_remove_roadmap(roadmap_id: str, Authorization=Header(...)):
+    token = decode_jwt(Authorization)
+    nickname = token["https://trilha.info/nickname"]
+    return remove_roadmap(roadmap_id, nickname)
+
 
 @app_private.get("/roadmap/{user_login}")
 async def get_get_roadmaps(user_login: str, Authorization=Header(...)):
