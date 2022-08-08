@@ -9,7 +9,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import initialize_app
 
-environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/flavio.mendes/Documents/Pers/trilhainfo-be/trilha-info-19010512f85d.json"
+environ["GOOGLE_APPLICATION_CREDENTIALS"] = "auth.json"
 cred = credentials.ApplicationDefault()
 
 initialize_app(cred, {
