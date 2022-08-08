@@ -138,7 +138,7 @@ async def post_create_roadmap(roadmap: RoadmapViewModel, Authorization=Header(..
 @app_private.get("/roadmap/{user_login}")
 async def get_get_roadmaps(user_login: str, Authorization=Header(...)):
     if authenticated_user(Authorization, user_login):
-        return get_roadmaps()
+        return get_roadmaps(user_login)
 
 
 @app_public.get("/roadmap/{id}")

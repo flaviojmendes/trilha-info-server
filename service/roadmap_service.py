@@ -42,8 +42,8 @@ def create_roadmap(roadmap: RoadmapViewModel):
     return roadmap
 
 
-def get_roadmaps():
-    doc_ref = db.collection(u'roadmaps').get()
+def get_roadmaps(user_login):
+    doc_ref = db.collection(u'roadmaps').where(u'owner', u'==', user_login).get()
     docs = []
     for doc in doc_ref:
         docs.append(doc.to_dict())
