@@ -3,9 +3,7 @@
 from datetime import datetime
 from os import environ
 from model.user_view_model import UserViewModel
-from firebase_admin import credentials
 from firebase_admin import firestore
-from firebase_admin import initialize_app
 
 
 
