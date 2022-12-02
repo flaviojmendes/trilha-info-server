@@ -12,8 +12,6 @@ from model.roadmap_view_model import RoadmapViewModel
 from model.comment_model import CommentModel
 from model.user_view_model import UserViewModel
 
-from firebase_admin import credentials
-from firebase_admin import initialize_app
 from os import environ
 
 app = FastAPI()
@@ -25,13 +23,6 @@ app.mount("/api", app_private)
 
 origins = ["*"]
 
-
-environ["GOOGLE_APPLICATION_CREDENTIALS"] = "auth.json"
-cred = credentials.ApplicationDefault()
-
-initialize_app(cred, {
-    'projectId': "trilha-info",
-})
 
 
 from service.roadmap_service import create_roadmap, get_roadmap, get_roadmaps, remove_roadmap
