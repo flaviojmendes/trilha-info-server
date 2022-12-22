@@ -8,13 +8,13 @@ from model.user_view_model import UserViewModel
 
 from firebase_admin import firestore
 
-from model.comment_model import CommentModel
+from model.note_model import NoteModel
 
 
 db = firestore.client()
 
 
-def create_comment(comment: CommentModel):
+def create_comment(comment: NoteModel):
 
     if comment.id is None:
         comment.id = str(uuid.uuid4())
@@ -36,8 +36,8 @@ def remove_comment(comment_id: str, user_name: str):
 
 
 
-def get_comments(content_id: str):
-    doc_ref = db.collection(u'comments').where(u'contentId', u'==', content_id).order_by(u"createdAt",  direction=firestore.Query.DESCENDING).get()
+def get_comments(content_id: str, nickname: str):
+    doc_ref = db.collection(u'comments').where(u'contentId', u'==', content_id).where(u'author', u'==', nickname).order_by(u"createdAt",  direction=firestore.Query.DESCENDING).get()
     docs = []
     for doc in doc_ref:
         docs.append(doc.to_dict())

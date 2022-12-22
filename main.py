@@ -1,5 +1,8 @@
+
 import json
 from fastapi.responses import Response
+
+from os import environ
 
 import os
 from urllib.request import urlopen
@@ -9,10 +12,20 @@ from jose import JWTError, jwt
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from model.roadmap_view_model import RoadmapViewModel
-from model.comment_model import CommentModel
+from model.note_model import NoteModel
 from model.user_view_model import UserViewModel
+from firebase_admin import credentials
+from firebase_admin import initialize_app
 
-from os import environ
+environ["GOOGLE_APPLICATION_CREDENTIALS"] = "auth.json"
+cred = credentials.ApplicationDefault()
+initialize_app(cred, {
+    'projectId': "trilha-info",
+})
+
+from service.comment_service import create_comment, remove_comment, get_comments
+from service.user_service import create_user, get_user, update_user
+from service.roadmap_service import create_roadmap, get_roadmap, get_roadmaps, remove_roadmap
 
 app = FastAPI()
 app_public = FastAPI(openapi_prefix='/public')
@@ -23,11 +36,6 @@ app.mount("/api", app_private)
 
 origins = ["*"]
 
-
-
-from service.roadmap_service import create_roadmap, get_roadmap, get_roadmaps, remove_roadmap
-from service.user_service import create_user, get_user, update_user
-from service.comment_service import create_comment, remove_comment, get_comments
 
 AUTH0_DOMAIN = "trilha-info.us.auth0.com"
 API_AUDIENCE = "TrilhaInfoApi"
@@ -80,9 +88,9 @@ async def verify_user_agent(request: Request, call_next):
         payload = decode_jwt(token)
         response = await call_next(request)
         return response
-    except:
+    except  Exception as err:
+        
         return Response(status_code=403)
-
 
 
 app.add_middleware(
@@ -103,7 +111,6 @@ app_private.add_middleware(
 )
 
 
-
 app_public.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -112,10 +119,12 @@ app_public.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app_private.get("/user/{user_login}")
 async def get_get_user(user_login: str, Authorization=Header(...)):
     if authenticated_user(Authorization, user_login):
         return get_user(user_login)
+
 
 def authenticated_user(Authorization, user_login):
     token = decode_jwt(Authorization)
@@ -136,7 +145,6 @@ async def post_create_user(user: UserViewModel, Authorization=Header(...)):
 async def put_update_user(user: UserViewModel, Authorization=Header(...)):
     if authenticated_user(Authorization, user.user_login):
         return update_user(user)
-
 
 
 @app_private.post("/roadmap")
@@ -163,24 +171,27 @@ async def get_get_roadmap(id: str):
     return get_roadmap(id)
 
 
-@app_public.get("/comments/{content_id}")
-async def get_get_comments_by_content_id(content_id: str):
-    return get_comments(content_id)
+@app_private.get("/notes/{content_id}")
+async def get_get_comments_by_content_id(content_id: str, Authorization=Header(...)):
+    token = decode_jwt(Authorization)
+    nickname = token["https://trilha.info/nickname"]
+    return get_comments(content_id, nickname)
 
 
-@app_private.delete("/comments/{comment_id}")
+@app_private.delete("/notes/{comment_id}")
 async def delete_comment(comment_id: str, Authorization=Header(...)):
     token = decode_jwt(Authorization)
     nickname = token["https://trilha.info/nickname"]
     return remove_comment(comment_id, nickname)
 
-@app_private.post("/comment")
-async def post_create_comment(comment: CommentModel, Authorization=Header(...)):
+
+@app_private.post("/note")
+async def post_create_comment(comment: NoteModel, Authorization=Header(...)):
     if authenticated_user(Authorization, comment.author):
         return create_comment(comment)
 
 if __name__ == '__main__':
-    if(os.environ["ENV"] == 'prod'):
+    if (os.environ["ENV"] == 'prod'):
         uvicorn.run("main:app",
                     host="0.0.0.0",
                     port=8000,

@@ -6,15 +6,7 @@ import uuid
 from model.roadmap_view_model import RoadmapViewModel
 from firebase_admin import firestore
 
-from firebase_admin import credentials
-from firebase_admin import initialize_app
 
-environ["GOOGLE_APPLICATION_CREDENTIALS"] = "auth.json"
-cred = credentials.ApplicationDefault()
-
-initialize_app(cred, {
-    'projectId': "trilha-info",
-})
 
 
 db = firestore.client()

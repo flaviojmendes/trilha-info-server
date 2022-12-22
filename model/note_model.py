@@ -5,7 +5,7 @@ import uuid
 from pydantic import BaseModel
 
 
-class CommentModel(BaseModel):
+class NoteModel(BaseModel):
     id: Optional[str]
     text: Optional[str]
     author: Optional[str]
