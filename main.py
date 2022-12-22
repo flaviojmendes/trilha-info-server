@@ -14,14 +14,6 @@ import uvicorn
 from model.roadmap_view_model import RoadmapViewModel
 from model.note_model import NoteModel
 from model.user_view_model import UserViewModel
-from firebase_admin import credentials
-from firebase_admin import initialize_app
-
-environ["GOOGLE_APPLICATION_CREDENTIALS"] = "auth.json"
-cred = credentials.ApplicationDefault()
-initialize_app(cred, {
-    'projectId': "trilha-info",
-})
 
 from service.comment_service import create_comment, remove_comment, get_comments
 from service.user_service import create_user, get_user, update_user
@@ -89,7 +81,7 @@ async def verify_user_agent(request: Request, call_next):
         response = await call_next(request)
         return response
     except  Exception as err:
-        
+
         return Response(status_code=403)
 
 

@@ -9,6 +9,14 @@ from model.user_view_model import UserViewModel
 from firebase_admin import firestore
 
 from model.note_model import NoteModel
+from firebase_admin import credentials
+from firebase_admin import initialize_app
+
+environ["GOOGLE_APPLICATION_CREDENTIALS"] = "auth.json"
+cred = credentials.ApplicationDefault()
+initialize_app(cred, {
+    'projectId': "trilha-info",
+})
 
 
 db = firestore.client()
