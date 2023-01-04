@@ -3,6 +3,7 @@ import json
 from fastapi.responses import Response
 
 from os import environ
+from fastapi.responses import FileResponse
 
 import os
 from urllib.request import urlopen
@@ -15,7 +16,7 @@ from model.roadmap_view_model import RoadmapViewModel
 from model.note_model import NoteModel
 from model.user_view_model import UserViewModel
 
-from service.comment_service import create_comment, remove_comment, get_comments
+from service.comment_service import create_comment, remove_comment, get_comments, export_comments_markdown
 from service.user_service import create_user, get_user, update_user
 from service.roadmap_service import create_roadmap, get_roadmap, get_roadmaps, remove_roadmap
 
@@ -158,16 +159,24 @@ async def get_get_roadmaps(user_login: str, Authorization=Header(...)):
         return get_roadmaps(user_login)
 
 
+@app_private.get("/note/export")
+async def export_notes(Authorization=Header(...)):
+    token = decode_jwt(Authorization)
+    nickname = token["https://trilha.info/nickname"]
+    return export_comments_markdown(nickname)
+    
+
+
 @app_public.get("/roadmap/{id}")
 async def get_get_roadmap(id: str):
     return get_roadmap(id)
 
 
-@app_private.get("/notes/{content_id}")
-async def get_get_comments_by_content_id(content_id: str, Authorization=Header(...)):
+@app_private.post("/notes/find")
+async def post_find_notes(note: NoteModel, Authorization=Header(...)):
     token = decode_jwt(Authorization)
     nickname = token["https://trilha.info/nickname"]
-    return get_comments(content_id, nickname)
+    return get_comments(note.contentId, nickname)
 
 
 @app_private.delete("/notes/{comment_id}")
