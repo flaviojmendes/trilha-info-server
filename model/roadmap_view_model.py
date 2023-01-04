@@ -15,7 +15,7 @@ class LinkContentType(Enum):
     READ = "Leia"
     LISTEN = "Ouça"
     VISIT = "Visite"
-
+    PRACTICE = "Pratique"
 
 class LinkViewModel(BaseModel):
     url: str

@@ -1,13 +1,8 @@
-
-
 from datetime import datetime
 from os import environ
 import uuid
 from model.roadmap_view_model import RoadmapViewModel
 from firebase_admin import firestore
-
-
-
 
 db = firestore.client()
 

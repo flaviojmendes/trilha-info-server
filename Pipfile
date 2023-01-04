@@ -8,6 +8,7 @@ fastapi = "*"
 firebase-admin = "*"
 uvicorn = "*"
 python-jose = "*"
+mdutils = "*"
 
 [dev-packages]
 autopep8 = "*"
