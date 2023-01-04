@@ -1,3 +1,0 @@
-
-Trilha Info Notes
-=================
