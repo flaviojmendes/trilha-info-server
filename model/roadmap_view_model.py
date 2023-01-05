@@ -43,4 +43,5 @@ class RoadmapViewModel(BaseModel):
     title: Optional[str]
     owner: Optional[str]
     description: Optional[str]
+    slug: Optional[str]
     levels: List[LevelViewModel]
