@@ -8,6 +8,8 @@ db = firestore.client()
 
 
 def create_roadmap(roadmap: RoadmapViewModel):
+    if check_slug_already_exists(roadmap.slug):
+        raise Exception("Slug already exists")
 
     if roadmap.id is None:
         roadmap.id = str(uuid.uuid4())
@@ -37,9 +39,9 @@ def remove_roadmap(roadmap_id: str, user_name: str):
         db.collection(u'roadmaps').document(roadmap_id).delete()
 
 
-
 def get_roadmaps(user_login):
-    doc_ref = db.collection(u'roadmaps').where(u'owner', u'==', user_login).get()
+    doc_ref = db.collection(u'roadmaps').where(
+        u'owner', u'==', user_login).get()
     docs = []
     for doc in doc_ref:
         docs.append(doc.to_dict())
@@ -49,4 +51,14 @@ def get_roadmaps(user_login):
 
 def get_roadmap(id: str):
     doc_ref = db.collection(u'roadmaps').document(id)
+    if doc_ref.get().exists is False:
+        slug_doc_ref = db.collection(
+            u'roadmaps').where(u'slug', u'==', id).get()
+        return slug_doc_ref[0].to_dict() if len(slug_doc_ref) > 0 else {}
     return doc_ref.get().to_dict()
+
+
+def check_slug_already_exists(slug: str, user_login: str):
+    slug_doc_ref = db.collection(u'roadmaps').where(
+        u'slug', u'==', slug).where(u'owner', u'!=', user_login).get()
+    return len(slug_doc_ref) > 0
