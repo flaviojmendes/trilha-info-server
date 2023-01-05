@@ -8,7 +8,7 @@ db = firestore.client()
 
 
 def create_roadmap(roadmap: RoadmapViewModel):
-    if check_slug_already_exists(roadmap.slug):
+    if check_slug_already_exists(roadmap.slug, roadmap.owner):
         raise Exception("Slug already exists")
 
     if roadmap.id is None:
