@@ -9,6 +9,8 @@ firebase-admin = "*"
 uvicorn = "*"
 python-jose = "*"
 mdutils = "*"
+linkedin-api = "*"
+python3-linkedin = "*"
 
 [dev-packages]
 autopep8 = "*"
