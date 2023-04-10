@@ -1,5 +1,6 @@
 
 import json
+from typing import List
 from fastapi.responses import Response
 
 from os import environ
@@ -12,6 +13,7 @@ from fastapi import FastAPI, HTTPException, Header, Request
 from jose import JWTError, jwt
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from model.certification_model import Certification, Question
 from model.roadmap_view_model import RoadmapViewModel
 from model.note_model import NoteModel
 from model.user_view_model import UserViewModel
@@ -19,6 +21,7 @@ from model.user_view_model import UserViewModel
 from service.comment_service import create_comment, remove_comment, get_comments, export_comments_markdown
 from service.user_service import create_user, get_user, update_user
 from service.roadmap_service import check_slug_already_exists, create_roadmap, get_roadmap, get_roadmaps, remove_roadmap
+from service.certification_service import get_certification, get_certification_highest_score, get_certification_result, get_certification_results, validate_certification
 
 app = FastAPI()
 app_public = FastAPI(openapi_prefix='/public')
@@ -81,9 +84,10 @@ async def verify_user_agent(request: Request, call_next):
         payload = decode_jwt(token)
         response = await call_next(request)
         return response
-    except  Exception as err:
+    except Exception as err:
 
         return Response(status_code=403)
+
 
 
 app.add_middleware(
@@ -197,6 +201,38 @@ async def delete_comment(comment_id: str, Authorization=Header(...)):
 async def post_create_comment(comment: NoteModel, Authorization=Header(...)):
     if authenticated_user(Authorization, comment.author):
         return create_comment(comment)
+
+
+@app_private.get("/certification/{id}") 
+async def get_get_certification(id: str, Authorization=Header(...)) -> Certification:
+    return get_certification(id)
+ 
+@app_private.post("/certification/{id}")
+async def post_validate_certification(questions: List[Question],id: str, Authorization=Header(...)):
+    token = decode_jwt(Authorization)
+    nickname = token["https://trilha.info/nickname"]
+    return validate_certification(questions, id, nickname)
+
+
+@app_private.get("/certification-result/{id}")
+async def get_get_certification_result(id: str, Authorization=Header(...)):
+    token = decode_jwt(Authorization)
+    nickname = token["https://trilha.info/nickname"]
+    return get_certification_result(id, nickname)
+
+@app_private.get("/certification-results")
+async def get_get_certification_result(Authorization=Header(...)):
+    token = decode_jwt(Authorization)
+    nickname = token["https://trilha.info/nickname"]
+    return get_certification_results(nickname)
+    
+
+@app_private.get("/certification/{certification_id}/highest-score")
+async def get_highest_certification(certification_id: str, Authorization=Header(...)):
+    token = decode_jwt(Authorization)
+    nickname = token["https://trilha.info/nickname"]
+    return get_certification_highest_score(certification_id, nickname)
+
 
 if __name__ == '__main__':
     if (os.environ["ENV"] == 'prod'):
